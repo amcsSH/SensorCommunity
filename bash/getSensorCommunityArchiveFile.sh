@@ -1,13 +1,14 @@
 #!/bin/bash
 #
-# get SensorCommunity a specific day(s)
+# get data files from Sensor.Community archive from a specific day(s)
 #
 # 2018/19 ; Andreas Cz ; inital
 # 2020-01 ; Andreas Cz ; changes from Luftdaten.info to Sensor.Community archive
 #
 
 #### must be set
-BASEDIR="~/AirQualityData/archive.sensor.community"
+BASENAME="archive.sensor.community"
+BASEDIR="~/AirQualityData/${BASENAME}"
 ####
 
 if [ -z "$1" ]
@@ -20,9 +21,18 @@ fi
 
 DAY=$1
 
+####
+CMDDATE=`which date`
+CMDWGET=`which wget`
+CMDMV=`which mv`
+CMDXZ=`which xz`
+
+FILEPARTS="_sds _b _d _h _p html txt"
+####
+
 if [ -z "$2" ]
   then
-    MONTH=`date +%m`
+    MONTH=`${CMDDATE} +%m`
     echo "set month"
 else
   MONTH=$2
@@ -30,31 +40,28 @@ fi
 
 if [ -z "$3" ]
   then
-    YEAR=`date +%Y`
+    YEAR=`${CMDDATE} +%Y`
     echo "set year"
 else
   YEAR=$3
 fi
 
 
-echo -e "\nget data from LuftdatenInfo for ${YEAR}-${MONTH}-${DAY}*"
+echo -e "\nget data from Sensor.Community archive for ${YEAR}-${MONTH}-${DAY}*"
 #wget -m -I "${YEAR}-${MONTH}-${DAY}*" https://archive.luftdaten.info/
-wget -m -I "${YEAR}-${MONTH}-${DAY}*" https://archive.sensor.community/
+${CMDWGET} -m -I "${YEAR}-${MONTH}-${DAY}*" https://archive.sensor.community/
 
 
-COLLECTDATES=`ls archive.luftdaten.info | egrep '20[0-2][0-9]-[0-3][0-9]-[0-3][0-9]' `
-for d in ${COLLECTDATES}; do
+COLLECTEDDATES=`ls ${BASENAME} | egrep '20[0-2][0-9]-[0-3][0-9]-[0-3][0-9]' `
+for d in ${COLLECTEDDATES}; do
   echo $d
-  CYEAR=`date +%Y --date="$d"`
-  CMONTH=`date +%m_%h --date="$d"`
+  CYEAR=`${CMDDATE} +%Y --date="$d"`
+  CMONTH=`${CMDDATE} +%m_%h --date="$d"`
   mkdir -p "${BASEDIR}/$CYEAR/$CMONTH"
-  /bin/mv -f archive.luftdaten.info/$d ${BASEDIR}/$CYEAR/$CMONTH
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*_sds* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*_b* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*_d* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*_h* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*_p* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*html* > /dev/null
-  xz -9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*txt* > /dev/null
+  ${CMDMV} -f archive.luftdaten.info/$d ${BASEDIR}/$CYEAR/$CMONTH
+  for filepart in ${FILEPARTS}; do
+    ${CMDXZ} -q9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*${filepart}* > /dev/null &
+  done
+  wait
 done
 
