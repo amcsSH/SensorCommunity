@@ -5,8 +5,8 @@
 #
 # requires: getSensorCommunityArchive.sh
 #
-# 2019 ; Andreas Cz ; initial
-# 
+# 2018/19 ; Andreas Cz ; initial
+# 2020-01 ; Andreas Cz ; changes from Luftdaten.info to Sensor.Community
 
 #### must be set
 BASEDIR="/media/cognac/Maxtor/AirQualityData/archive.luftdaten.info"
@@ -17,7 +17,15 @@ if [ -z "$1" ]
   then
     YEAR="2019"
 else
-    YEAR=$1
+    if [ "--help" == "$1"]; then
+      echo "Usage:  $0 [YEAR]"
+      echo
+      echo " --help :  this help"
+      echo " [YEAR] :  like '2019' or '2020'"
+      exit 2
+    else
+      YEAR=$1
+    fi    
 fi
 
 ####
@@ -32,9 +40,9 @@ for month in $(seq -f "%02g" 1 12) ; do
 	
 	if [ "$RET" == "0" ] ; then
   	  echo ${YEAR}-$month-${day}
-  	  CMONTH=`date +%m_%h --date="${YEAR}-${month}-${day}"`
+  	  CMONTH=`${CMDDATE} +%m_%h --date="${YEAR}-${month}-${day}"`
   	  if [ ! -d "${BASEDIR}/$YEAR/$CMONTH/${YEAR}-${month}-${day}" ] ; then 
-            ./getLuftDatenInfoArchive.sh ${day} ${month} ${YEAR}
+            ./getSensorCommunityArchveFile.sh ${day} ${month} ${YEAR}
           fi
   	fi  	
 

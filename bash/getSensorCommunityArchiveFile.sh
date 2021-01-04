@@ -2,13 +2,12 @@
 #
 # get SensorCommunity a specific day(s)
 #
-# 2018/9 ; Andreas Cz ; inital
-# 2020-01-01 ; Andreas Cz ; change to SensorCommunity archive
+# 2018/19 ; Andreas Cz ; inital
+# 2020-01 ; Andreas Cz ; changes from Luftdaten.info to Sensor.Community archive
 #
 
 #### must be set
-BASEDIR="/home/cognac/projects/AirQuality/LuftdatenInfo/archive.luftdaten.info"
-BASEDIR="/media/cognac/Maxtor/AirQualityData/archive.luftdaten.info"
+BASEDIR="~/AirQualityData/archive.sensor.community"
 ####
 
 if [ -z "$1" ]
