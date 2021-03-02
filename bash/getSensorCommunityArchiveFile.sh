@@ -7,7 +7,9 @@
 #
 
 #### must be set
+# BASENAME is the subdir to store and organize the data files
 BASENAME="archive.sensor.community"
+# BASEDIR is the main directory
 BASEDIR="~/AirQualityData/${BASENAME}"
 ####
 
@@ -24,6 +26,8 @@ DAY=$1
 ####
 CMDDATE=`which date`
 CMDWGET=`which wget`
+CMDLS=`which ls`
+CMDMKDIR=`which mkdir`
 CMDMV=`which mv`
 CMDXZ=`which xz`
 
@@ -57,10 +61,12 @@ for d in ${COLLECTEDDATES}; do
   echo $d
   CYEAR=`${CMDDATE} +%Y --date="$d"`
   CMONTH=`${CMDDATE} +%m_%h --date="$d"`
-  mkdir -p "${BASEDIR}/$CYEAR/$CMONTH"
-  ${CMDMV} -f archive.luftdaten.info/$d ${BASEDIR}/$CYEAR/$CMONTH
+  ${CMDMKDIR} -p "${BASEDIR}/$CYEAR/$CMONTH"
+  ${CMDMV} -f ${BASENAME}/$d ${BASEDIR}/$CYEAR/$CMONTH
+  # compress csv files to save storage space
   for filepart in ${FILEPARTS}; do
-    ${CMDXZ} -q9 ${BASEDIR}/$CYEAR/$CMONTH/$d/*${filepart}* > /dev/null &
+    CSVFILES=`${CMDLS} ${BASEDIR}/$CYEAR/$CMONTH/$d/*${filepart}* | grep -v "\.xz" | grep -v "_indoor" `
+    ${CMDXZ} --compress --threads=3 --quiet -7 ${CSVFILES} > /dev/null &
   done
   wait
 done

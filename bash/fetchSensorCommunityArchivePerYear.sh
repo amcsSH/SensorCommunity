@@ -9,7 +9,8 @@
 # 2020-01 ; Andreas Cz ; changes from Luftdaten.info to Sensor.Community
 
 #### must be set
-BASEDIR="/media/cognac/Maxtor/AirQualityData/archive.luftdaten.info"
+# BASEDIR is the main directory
+BASEDIR="~/AirQualityData/archive.luftdaten.info"
 ####
 
 
